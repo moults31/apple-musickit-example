@@ -7,7 +7,9 @@ function getEl(id) {
 
 document.addEventListener('musickitloaded', () => {
   // MusicKit global is now defined
-  fetch('/token').then(response => response.json()).then(res => {
+  fetch('/token',{
+  })
+  .then(response => response.json()).then(res => {
     music = MusicKit.configure({
       developerToken: res.token,
       app: {
@@ -15,6 +17,18 @@ document.addEventListener('musickitloaded', () => {
         build: '1978.4.1'
       }
     });
+
+
+
+    music.authorize().then(musicUserToken => {
+        console.log(musicUserToken);
+      }).then(
+        fetch('/token',{
+            method: 'put',
+            body: JSON.stringify({usertoken: music.musicUserToken}),
+            headers: { "Content-Type": "application/json" }
+        })
+      );
 
     // setup click handlers
     getEl('add-to-q-btn').addEventListener('click', () => {
