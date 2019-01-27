@@ -21,7 +21,6 @@ document.addEventListener('musickitloaded', () => {
 
 
     music.authorize().then(musicUserToken => {
-        console.log(musicUserToken);
       }).then(
         fetch('/token',{
             method: 'put',

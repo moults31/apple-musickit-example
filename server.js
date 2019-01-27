@@ -32,8 +32,6 @@ const token = jwt.sign({}, private_key, {
   }
 });
 
-console.log(token)
-
 sessionstorage.setItem('usertoken', '')
 
 app.use(bodyParser.json());
