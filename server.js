@@ -18,17 +18,21 @@ app.get('/', function (req, res) {
 });
 
 const private_key = fs.readFileSync('apple_private_key.p8').toString();
-const team_id = ''; // your 10 character apple team id, found in https://developer.apple.com/account/#/membership/
-const key_id = ''; // your 10 character generated music key id. more info https://help.apple.com/developer-account/#/dev646934554
+
+var am_key = process.env.APPLEMUSIC_KEY;
+var am_tid = process.env.APPLEMUSIC_TEAMID;
+
 const token = jwt.sign({}, private_key, {
   algorithm: 'ES256',
   expiresIn: '180d',
-  issuer: team_id,
+  issuer: am_tid,
   header: {
     alg: 'ES256',
-    kid: key_id
+    kid: am_key
   }
 });
+
+console.log(token)
 
 sessionstorage.setItem('usertoken', '')
 
@@ -41,31 +45,29 @@ app.get('/token', function (req, res) {
 });
 
 app.put('/token', function (req, res) {
-    console.log(req.body['usertoken'])
-    // app.locals.usertoken = req.body['usertoken']
-    sessionstorage.setItem('usertoken', req.body['usertoken']);
-    var tmp = sessionstorage.getItem('usertoken')
-    
+  // Index page will load apple musickit automatically and issue a put request
+  // to send the value of the music user token to here.
+  // Store it in session storage so we can report it to python app later.
+  sessionstorage.setItem('usertoken', req.body['usertoken']);
 });
 
 app.get('/usertoken', function (req, res) {
   res.setHeader('Content-Type', 'application/json');
-  var t = sessionstorage.getItem('usertoken')
-  res.send(JSON.stringify({usertoken: "dummy token"}));
-  console.log("token:");
-  console.log(t);
-  // server.close();
+  var t = sessionstorage.getItem('usertoken').toString()
+
+  if(t == '')
+  {
+    res.send("Not initialized");
+  }
+  else
+  {
+    // If we have the user token, send it now.
+    res.send(JSON.stringify({usertoken: t}));
+    server.close();
+  }  
 });
 
-  // app.put('/exit', function (req, res) {
-  //   server.close();
-  // });
-
-
-
 app.use(express.static(publicDir));
-
-console.log();
 
 console.log('Listening at', publicDir, hostname, port);
 server = app.listen(port, hostname);
