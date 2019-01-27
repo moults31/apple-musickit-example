@@ -61,6 +61,7 @@ app.get('/usertoken', function (req, res) {
   {
     // If we have the user token, send it now.
     res.send(JSON.stringify({usertoken: t}));
+    console.log("Token sent. Closing JS Server.")
     server.close();
   }  
 });
