@@ -19,10 +19,6 @@ app.get('/', function (req, res) {
 
 const private_key = fs.readFileSync('apple_private_key.p8').toString();
 
-// var am_key = process.env.APPLEMUSIC_KEY;
-// var am_tid = process.env.APPLEMUSIC_TEAMID;
-
-
 var am_key = "";
 var am_tid = "";
 
@@ -82,10 +78,16 @@ app.get('/usertoken', function (req, res) {
   {
     res.send("Not initialized");
   }
+  else if(t == "")
+  {
+    res.send("Not initialized");
+  }
   else
   {
     // If we have the user token, send it now.
     res.send(JSON.stringify({usertoken: t.toString()}));
+    console.log('Token:')
+    console.log(t.toString())
     console.log("Token sent. Closing JS Server.")
     server.close();
   }  
