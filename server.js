@@ -19,8 +19,33 @@ app.get('/', function (req, res) {
 
 const private_key = fs.readFileSync('apple_private_key.p8').toString();
 
-var am_key = process.env.APPLEMUSIC_KEY;
-var am_tid = process.env.APPLEMUSIC_TEAMID;
+// var am_key = process.env.APPLEMUSIC_KEY;
+// var am_tid = process.env.APPLEMUSIC_TEAMID;
+
+
+var am_key = "";
+var am_tid = "";
+
+// Get Apple music key and teamid from local .env file
+var textByLine = fs.readFileSync('../../.env').toString().split("\n");
+for (var i = 0; i < textByLine.length; i++) {
+
+    var s = textByLine[i]
+    if (s.includes("APPLEMUSIC_KEY"))
+    {
+      console.log(s)
+      var s_kvpair = s.split('=')
+      var s_v = s_kvpair[1].split('\n')[0]
+      am_key = s_v
+    }
+    if (s.includes("APPLEMUSIC_TEAMID"))
+    {
+      console.log(s)
+      var s_kvpair = s.split('=')
+      var s_v = s_kvpair[1].split('\n')[0]
+      am_tid = s_v
+    }
+}
 
 const token = jwt.sign({}, private_key, {
   algorithm: 'ES256',
@@ -51,16 +76,16 @@ app.put('/token', function (req, res) {
 
 app.get('/usertoken', function (req, res) {
   res.setHeader('Content-Type', 'application/json');
-  var t = sessionstorage.getItem('usertoken').toString()
+  var t = sessionstorage.getItem('usertoken')
 
-  if(t == '')
+  if(t == undefined)
   {
     res.send("Not initialized");
   }
   else
   {
     // If we have the user token, send it now.
-    res.send(JSON.stringify({usertoken: t}));
+    res.send(JSON.stringify({usertoken: t.toString()}));
     console.log("Token sent. Closing JS Server.")
     server.close();
   }  
